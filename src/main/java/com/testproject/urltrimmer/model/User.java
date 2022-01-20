@@ -7,8 +7,11 @@ import javax.validation.constraints.*;
 @Table(name = "users")
 public class User {
 
+    public static final int START_SEQ = 100000;
+
     @Id
-    @Column(name = "id")
+    @SequenceGenerator(name = "global_seq", sequenceName = "global_seq", allocationSize = 1, initialValue = START_SEQ)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_seq")
     private Integer id;
 
     @NotBlank
@@ -37,6 +40,14 @@ public class User {
 
     public User() {
 
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public void setEmail(String email) {
