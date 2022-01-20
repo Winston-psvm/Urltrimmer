@@ -1,14 +1,9 @@
 package com.testproject.urltrimmer.model;
 
-public class UserTo {
+public record UserTo(Integer id, String email, String password) {
 
-    private final String email;
-
-    private final String password;
-
-    public UserTo(String email, String password) {
-        this.email = email;
-        this.password = password;
+    public Integer getId() {
+        return id;
     }
 
     public String getEmail() {
