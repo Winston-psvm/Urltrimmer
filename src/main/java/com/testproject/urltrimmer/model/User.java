@@ -1,7 +1,16 @@
 package com.testproject.urltrimmer.model;
 
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -26,16 +35,22 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @NotNull
-    @Enumerated
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "role"}, name = "uk_user_roles")})
     @Column(name = "role")
-    private Role role;
+    @ElementCollection(fetch = FetchType.EAGER)
+//    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 200)
+    @JoinColumn(name = "user_id") //https://stackoverflow.com/a/62848296/548473
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Role> role;
 
     public User(Integer id, String email, String password, Role role) {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.role = role;
+        this.role = Collections.singleton(role);
     }
 
     public User() {
@@ -58,11 +73,11 @@ public class User {
         this.password = password;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRoles(Collection<Role> roles) {
+        this.role = CollectionUtils.isEmpty(roles) ? EnumSet.noneOf(Role.class) : EnumSet.copyOf(roles);
     }
 
-    public Role getRole() {
+    public Set<Role> getRole() {
         return role;
     }
 

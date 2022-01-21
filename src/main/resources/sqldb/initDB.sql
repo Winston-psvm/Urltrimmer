@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS user_roles;
-DROP TABLE IF EXISTS url;
-DROP TABLE IF EXISTS users;
+-- DROP TABLE IF EXISTS user_roles;
+-- DROP TABLE IF EXISTS url;
+-- DROP TABLE IF EXISTS users;
 DROP SEQUENCE IF EXISTS global_seq;
 
 CREATE SEQUENCE global_seq START WITH 100000;
@@ -8,8 +8,7 @@ CREATE SEQUENCE global_seq START WITH 100000;
 create table users(
     id          integer         primary key DEFAULT nextval('global_seq') ,
     email       varchar         unique ,
-    password    varchar         not null ,
-    role        varchar         not null
+    password    varchar         not null
 );
 CREATE UNIQUE INDEX users_unique_email_idx ON users (email);
 
