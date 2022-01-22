@@ -5,17 +5,15 @@ spring:
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
-      
     properties:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 20
         jdbc.batch_size: 20
-
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: user
+    url: jdbc:h2:mem:urltrimmer
+    username: sa
+    password:
 
   jackson:
     visibility:
@@ -23,16 +21,6 @@ spring:
       getter: none
       setter: none
       is-getter: none
-
-  cache:
-    cache-names: menu, restaurant
-    caffeine.spec: maximumSize=1,expireAfterAccess=60s
-
-logging:
-  level:
-    root: WARN
-    ru.javaops.topjava2: DEBUG
-    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: DEBUG
 
 server.servlet:
   encoding:

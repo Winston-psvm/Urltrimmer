@@ -1,7 +1,9 @@
 package com.testproject.urltrimmer.web;
 
+import com.testproject.urltrimmer.model.ShortUrl;
 import com.testproject.urltrimmer.model.User;
 import com.testproject.urltrimmer.model.UserTo;
+import com.testproject.urltrimmer.repository.JpaUrlRepository;
 import com.testproject.urltrimmer.repository.JpaUserRepository;
 import com.testproject.urltrimmer.util.exception.IllegalRequestDataException;
 import org.slf4j.Logger;
@@ -13,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
-import java.util.Optional;
+import java.util.List;
 
 import static com.testproject.urltrimmer.util.UserUtil.*;
 import static com.testproject.urltrimmer.util.ValidationUtil.assureIdConsistent;
@@ -22,31 +23,33 @@ import static com.testproject.urltrimmer.util.ValidationUtil.checkNew;
 
 @RestController
 @RequestMapping(value = "/UrlTrimmer/profile", produces = MediaType.APPLICATION_JSON_VALUE)
-public class RestProfileController {
+public class ProfileRestController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final JpaUserRepository repository;
+    private final JpaUserRepository userRepository;
+    private final JpaUrlRepository urlRepository;
 
-    public RestProfileController(JpaUserRepository repository) {
-        this.repository = repository;
+    public ProfileRestController(JpaUserRepository userRepository, JpaUrlRepository urlRepository) {
+        this.userRepository = userRepository;
+        this.urlRepository = urlRepository;
     }
 
     @Transactional
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@Valid @RequestBody UserTo to){
-        log.info("create user {}", to );
+    public void register(@Valid @RequestBody UserTo to) {
+        log.info("create user {}", to);
         checkNew(to);
         checkEmail(to);
 
-        repository.save(prepareToSave(createNewFromTo(to)));
+        userRepository.save(prepareToSave(createNewFromTo(to)));
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@AuthenticationPrincipal AuthUser authUser) {
         log.info("delete {}", authUser);
-        repository.delete(authUser.id());
+        userRepository.delete(authUser.id());
     }
 
     @Transactional
@@ -59,13 +62,21 @@ public class RestProfileController {
         assureIdConsistent(to, authUser.id());
         User user = authUser.getUser();
 
-        repository.save(prepareToSave(updateFromTo(user, to)));
+        userRepository.save(prepareToSave(updateFromTo(user, to)));
     }
 
+    @GetMapping
+    public User getUser(@AuthenticationPrincipal AuthUser authUser) {
+        return authUser.getUser();
+    }
 
+    @GetMapping("/url")
+    public List<ShortUrl> getUrls(@AuthenticationPrincipal AuthUser authUser) {
+        return urlRepository.getAllByUserId(authUser.id());
+    }
 
-    private void checkEmail(UserTo to){
-        if (repository.getByEmail(to.getEmail().toLowerCase()).isPresent())
+    private void checkEmail(UserTo to) {
+        if (userRepository.getByEmail(to.getEmail().toLowerCase()).isPresent())
             throw new IllegalRequestDataException("This email has already existed.");
     }
 }

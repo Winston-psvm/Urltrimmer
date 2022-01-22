@@ -8,5 +8,4 @@ public interface JpaUserRepository extends BaseRepository<User> {
 
     Optional<User> getByEmail(String email);
 
-
 }
