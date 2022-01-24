@@ -12,9 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -45,13 +42,7 @@ public class UrlRestController {
         Optional<ShortUrl> optShort = repository.findByFullUrl(url.getFullUrl());
         if (optShort.isPresent()) return optShort.get();
 
-        StringBuilder hash = new StringBuilder(generator.generate(url.getFullUrl().length()));
-        List<ShortUrl> listUrl= repository.findAll();
-        for (int i = 0; i < listUrl.size(); i++) {
-            if (listUrl.get(i).getShortUrl().equals(PATH + hash))
-                hash.append(generator.generate(i).length());
-                i = 0;
-        }
+        String hash = generator.generate(url.getFullUrl().length());
 
         Optional<AuthUser> optional = Optional.ofNullable(authUser);
         if (optional.isEmpty())
