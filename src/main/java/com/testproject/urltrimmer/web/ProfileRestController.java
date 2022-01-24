@@ -2,12 +2,10 @@ package com.testproject.urltrimmer.web;
 
 import com.testproject.urltrimmer.model.ShortUrl;
 import com.testproject.urltrimmer.model.User;
-import com.testproject.urltrimmer.model.UserTo;
+import com.testproject.urltrimmer.to.UserTo;
 import com.testproject.urltrimmer.repository.JpaUrlRepository;
 import com.testproject.urltrimmer.repository.JpaUserRepository;
 import com.testproject.urltrimmer.util.exception.IllegalRequestDataException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,10 +20,9 @@ import static com.testproject.urltrimmer.util.ValidationUtil.assureIdConsistent;
 import static com.testproject.urltrimmer.util.ValidationUtil.checkNew;
 
 @RestController
-@RequestMapping(value = "/UrlTrimmer/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/UrlTrimmer/api/profile", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProfileRestController {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
     private final JpaUserRepository userRepository;
     private final JpaUrlRepository urlRepository;
 
@@ -38,7 +35,6 @@ public class ProfileRestController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void register(@Valid @RequestBody UserTo to) {
-        log.info("create user {}", to);
         checkNew(to);
         checkEmail(to);
 
@@ -48,7 +44,6 @@ public class ProfileRestController {
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@AuthenticationPrincipal AuthUser authUser) {
-        log.info("delete {}", authUser);
         userRepository.delete(authUser.id());
     }
 
@@ -56,7 +51,6 @@ public class ProfileRestController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@RequestBody @Valid UserTo to, @AuthenticationPrincipal AuthUser authUser) {
-        log.info("update {}", authUser);
 
         if (!to.getEmail().equals(authUser.getUser().getEmail())) checkEmail(to);
         assureIdConsistent(to, authUser.id());

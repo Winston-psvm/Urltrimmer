@@ -5,3 +5,6 @@ VALUES ('user@yandex.ru', '{noop}password'),
 INSERT INTO user_roles (role, user_id)
 VALUES ('USER', 1),
        ('ADMIN', 2);
+
+INSERT INTO url (FULL_URL, SHORT_URL, USER_ID, DATE_TIME)
+VALUES ('https://www.google.by', 'http://localhost:8080/UrlTrimmer/2bfy5zddkfn1jdh5rzd20', 2, now());

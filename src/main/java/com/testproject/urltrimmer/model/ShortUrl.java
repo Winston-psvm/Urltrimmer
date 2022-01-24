@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -25,22 +23,31 @@ public class ShortUrl extends BaseEntity {
     @NotBlank
     @NotEmpty
     @NotNull
-    @Column(name = "short_url", unique = true)
+    @Column(name = "short_url",nullable = false, unique = true)
     private String shortUrl;
+
+    @NotNull
+    @Column(name = "date_time", nullable = false)
+    private LocalDateTime dateTime;
 
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
     private Integer userId;
 
-    public ShortUrl(Integer id, String fullUrl, String shortUrl, Integer userId) {
+    public ShortUrl(Integer id, String fullUrl, String shortUrl, Integer userId, LocalDateTime dateTime) {
         this.id = id;
         this.fullUrl = fullUrl;
         this.shortUrl = shortUrl;
         this.userId = userId;
+        this.dateTime = dateTime;
     }
 
     public ShortUrl() {}
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
 
     public Integer getUserId() {
         return userId;

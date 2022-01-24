@@ -1,4 +1,4 @@
-package com.testproject.urltrimmer.model;
+package com.testproject.urltrimmer.to;
 
 public record UserTo(Integer id, String email, String password) {
 

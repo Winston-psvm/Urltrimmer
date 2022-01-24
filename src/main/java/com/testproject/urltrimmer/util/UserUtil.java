@@ -2,7 +2,7 @@ package com.testproject.urltrimmer.util;
 
 import com.testproject.urltrimmer.model.Role;
 import com.testproject.urltrimmer.model.User;
-import com.testproject.urltrimmer.model.UserTo;
+import com.testproject.urltrimmer.to.UserTo;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

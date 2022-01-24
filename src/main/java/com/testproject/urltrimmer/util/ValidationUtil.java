@@ -1,6 +1,6 @@
 package com.testproject.urltrimmer.util;
 
-import com.testproject.urltrimmer.model.UserTo;
+import com.testproject.urltrimmer.to.UserTo;
 import com.testproject.urltrimmer.util.exception.IllegalRequestDataException;
 
 public final class ValidationUtil {
