@@ -31,6 +31,7 @@ public class UrlRestController {
         this.generator = generator;
     }
 
+    @Transactional
     @GetMapping("/{shortUrl}")
     public ResponseEntity<Object> redirectUrl(@PathVariable String shortUrl){
         Optional<ShortUrl> optionalShortUrl = repository.findByShortUrl(PATH + shortUrl);

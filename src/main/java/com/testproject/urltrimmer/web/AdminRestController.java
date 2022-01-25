@@ -5,6 +5,8 @@ import com.testproject.urltrimmer.model.ShortUrl;
 import com.testproject.urltrimmer.model.User;
 import com.testproject.urltrimmer.repository.JpaUrlRepository;
 import com.testproject.urltrimmer.repository.JpaUserRepository;
+import com.testproject.urltrimmer.to.UrlTo;
+import com.testproject.urltrimmer.to.UserTo;
 import com.testproject.urltrimmer.util.exception.IllegalRequestDataException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,11 +14,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static com.testproject.urltrimmer.util.UserUtil.prepareToSave;
+import static com.testproject.urltrimmer.util.UserUtil.updateFromTo;
+import static com.testproject.urltrimmer.util.ValidationUtil.assureIdConsistent;
 
 @RestController
 @RequestMapping(value = "/UrlTrimmer/api/admin", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,6 +62,16 @@ public class AdminRestController {
         urlRepository.delete(id);
     }
 
+    @Transactional
+    @PutMapping(value = "/urls/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateUrl(@RequestBody @Valid UrlTo to, @PathVariable Integer id) {
+        ShortUrl oldUrl = urlRepository.getById(id);
 
+        oldUrl.setShortUrl(to.url());
+        oldUrl.setEndDate(to.endDate());
+
+        urlRepository.save(oldUrl);
+    }
 
 }

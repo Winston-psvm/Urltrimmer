@@ -61,6 +61,10 @@ public class ShortUrl extends BaseEntity {
         return fullUrl;
     }
 
+    public void setShortUrl(String shortUrl) {
+        this.shortUrl = shortUrl;
+    }
+
     public LocalDate getEndDate() {
         return endDate;
     }
