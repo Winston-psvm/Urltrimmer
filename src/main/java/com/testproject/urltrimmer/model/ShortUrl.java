@@ -10,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Entity
@@ -35,12 +36,20 @@ public class ShortUrl extends BaseEntity {
     @JsonBackReference
     private Integer userId;
 
+    @Column(name = "counter")
+    private Integer counter;
+
+    public Integer getCounter() {
+        return counter;
+    }
+
     public ShortUrl(Integer id, String fullUrl, String shortUrl, Integer userId, LocalDate endDate) {
         this.id = id;
         this.fullUrl = fullUrl;
         this.shortUrl = shortUrl;
         this.userId = userId;
         this.endDate = endDate;
+        this.counter = 0;
     }
 
     public ShortUrl() {}

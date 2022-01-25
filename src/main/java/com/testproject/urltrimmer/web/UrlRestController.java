@@ -13,9 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAmount;
 import java.util.Optional;
 
 @RestController
@@ -39,6 +37,7 @@ public class UrlRestController {
         if (optionalShortUrl.isEmpty()) throw new IllegalRequestDataException("Link not found.");
             ShortUrl url = optionalShortUrl.get();
         if (checkDate(url.getEndDate())) {
+            repository.updateUrlCounter(url.getId());
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", url.getFullUrl());
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
