@@ -18,8 +18,8 @@ public interface JpaUrlRepository extends BaseRepository<ShortUrl> {
 
     ShortUrl getByIdAndUserId(Integer id, Integer userId);
 
-//    @Transactional
     @Modifying
     @Query("UPDATE ShortUrl s set s.counter = s.counter + 1 where s.id = :id")
     void updateUrlCounter(Integer id);
+
 }

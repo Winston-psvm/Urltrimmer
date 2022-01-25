@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Entity
@@ -39,10 +40,6 @@ public class ShortUrl extends BaseEntity {
     @Column(name = "counter")
     private Integer counter;
 
-    public Integer getCounter() {
-        return counter;
-    }
-
     public ShortUrl(Integer id, String fullUrl, String shortUrl, Integer userId, LocalDate endDate) {
         this.id = id;
         this.fullUrl = fullUrl;
@@ -53,6 +50,10 @@ public class ShortUrl extends BaseEntity {
     }
 
     public ShortUrl() {}
+
+    public Integer getCounter() {
+        return counter;
+    }
 
     public Integer getUserId() {
         return userId;

@@ -1,10 +1,8 @@
 package com.testproject.urltrimmer.web;
 
-import com.testproject.urltrimmer.model.ShortUrl;
 import com.testproject.urltrimmer.model.User;
-import com.testproject.urltrimmer.to.UserTo;
-import com.testproject.urltrimmer.repository.JpaUrlRepository;
 import com.testproject.urltrimmer.repository.JpaUserRepository;
+import com.testproject.urltrimmer.to.UserTo;
 import com.testproject.urltrimmer.util.exception.IllegalRequestDataException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 
 import static com.testproject.urltrimmer.util.UserUtil.*;
 import static com.testproject.urltrimmer.util.ValidationUtil.assureIdConsistent;
@@ -25,11 +21,9 @@ import static com.testproject.urltrimmer.util.ValidationUtil.checkNew;
 public class ProfileRestController {
 
     private final JpaUserRepository userRepository;
-    private final JpaUrlRepository urlRepository;
 
-    public ProfileRestController(JpaUserRepository userRepository, JpaUrlRepository urlRepository) {
+    public ProfileRestController(JpaUserRepository userRepository) {
         this.userRepository = userRepository;
-        this.urlRepository = urlRepository;
     }
 
     @Transactional
@@ -64,20 +58,6 @@ public class ProfileRestController {
 
         userRepository.save(prepareToSave(updateFromTo(user, to)));
     }
-
-    @GetMapping("/urls")
-    public List<ShortUrl> getUrls(@AuthenticationPrincipal AuthUser authUser) {
-        return urlRepository.getAllByUserId(authUser.id());
-    }
-
-    @DeleteMapping("/urls/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUrl(@PathVariable Integer id, @AuthenticationPrincipal AuthUser authUser){
-        Optional<ShortUrl> url = Optional.ofNullable(urlRepository.getByIdAndUserId(id, authUser.id()));
-        if (url.isPresent()) urlRepository.delete(id);
-        else throw new IllegalRequestDataException("You don't own this url");
-    }
-
 
     private void checkEmail(UserTo to) {
         if (userRepository.getByEmail(to.getEmail().toLowerCase()).isPresent())
