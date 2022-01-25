@@ -12,7 +12,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAmount;
 import java.util.Optional;
 
 @RestController
@@ -31,9 +34,17 @@ public class UrlRestController {
     @GetMapping("/{shortUrl}")
     public ResponseEntity<Object> redirectUrl(@PathVariable String shortUrl){
         Optional<ShortUrl> optionalShortUrl = repository.findByShortUrl(PATH + shortUrl);
-        return optionalShortUrl.map(url -> ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                .header(HttpHeaders.LOCATION,
-                        url.getFullUrl()).build()).orElseGet(() -> ResponseEntity.notFound().build());
+
+        if (optionalShortUrl.isEmpty()) throw new IllegalRequestDataException("Link not found.");
+            ShortUrl url = optionalShortUrl.get();
+        if (checkDate(url.getEndDate())) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", url.getFullUrl());
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        } else {
+            deleteDeadLink(url.getId());
+            throw new IllegalRequestDataException("The life of your link is over.");
+        }
     }
 
     @Transactional
@@ -50,11 +61,18 @@ public class UrlRestController {
         Optional<AuthUser> optional = Optional.ofNullable(authUser);
         if (optional.isEmpty())
         return repository.save(new ShortUrl
-                (null, url.getFullUrl() , PATH + hash , null ,
-                        ZonedDateTime.now().toLocalDateTime()));
+                (null, url.getFullUrl() , PATH + hash , null , url.getEndDate()));
 
         else return repository.save(new ShortUrl
-                (null, url.getFullUrl() , PATH + hash , authUser.id() ,
-                        ZonedDateTime.now().toLocalDateTime()));
+                (null, url.getFullUrl() , PATH + hash , authUser.id(), url.getEndDate()));
     }
+
+    private void deleteDeadLink(Integer id){
+        repository.delete(id);
+    }
+
+    private boolean checkDate(LocalDate endDate){
+        if (ZonedDateTime.now().toLocalDate().isEqual(endDate)) return true;
+        return ZonedDateTime.now().toLocalDate().isBefore(endDate);
+        }
 }

@@ -15,4 +15,6 @@ public interface JpaUrlRepository extends BaseRepository<ShortUrl> {
 
     ShortUrl getByIdAndUserId(Integer id, Integer userId);
 
+    void deleteByShortUrl(String shortUrl);
+
 }
