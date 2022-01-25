@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 import static com.testproject.urltrimmer.util.UserUtil.*;
 import static com.testproject.urltrimmer.util.ValidationUtil.assureIdConsistent;
@@ -47,6 +48,11 @@ public class ProfileRestController {
         userRepository.delete(authUser.id());
     }
 
+    @GetMapping
+    public User getUser(@AuthenticationPrincipal AuthUser authUser) {
+        return authUser.getUser();
+    }
+
     @Transactional
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -59,15 +65,19 @@ public class ProfileRestController {
         userRepository.save(prepareToSave(updateFromTo(user, to)));
     }
 
-    @GetMapping
-    public User getUser(@AuthenticationPrincipal AuthUser authUser) {
-        return authUser.getUser();
-    }
-
-    @GetMapping("/url")
+    @GetMapping("/urls")
     public List<ShortUrl> getUrls(@AuthenticationPrincipal AuthUser authUser) {
         return urlRepository.getAllByUserId(authUser.id());
     }
+
+    @DeleteMapping("/urls/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUrl(@PathVariable Integer id, @AuthenticationPrincipal AuthUser authUser){
+        Optional<ShortUrl> url = Optional.ofNullable(urlRepository.getByIdAndUserId(id, authUser.id()));
+        if (url.isPresent()) urlRepository.delete(id);
+        else throw new IllegalRequestDataException("You don't own this url");
+    }
+
 
     private void checkEmail(UserTo to) {
         if (userRepository.getByEmail(to.getEmail().toLowerCase()).isPresent())

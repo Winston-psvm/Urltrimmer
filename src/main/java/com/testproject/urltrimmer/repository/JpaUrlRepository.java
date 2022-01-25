@@ -13,4 +13,6 @@ public interface JpaUrlRepository extends BaseRepository<ShortUrl> {
 
     Optional<ShortUrl> findByFullUrl(String fullUrl);
 
+    ShortUrl getByIdAndUserId(Integer id, Integer userId);
+
 }

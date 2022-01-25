@@ -3,6 +3,7 @@ package com.testproject.urltrimmer.web;
 import com.testproject.urltrimmer.model.ShortUrl;
 import com.testproject.urltrimmer.repository.JpaUrlRepository;
 import com.testproject.urltrimmer.util.CodeGenerator;
+import com.testproject.urltrimmer.util.exception.IllegalRequestDataException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +44,8 @@ public class UrlRestController {
         if (optShort.isPresent()) return optShort.get();
 
         String hash = generator.generate(url.getFullUrl().length());
+        Optional<ShortUrl> optionalShortUrl = repository.findByShortUrl(PATH + hash);
+        if (optionalShortUrl.isPresent()) throw new IllegalRequestDataException("Oops. Something went wrong.");
 
         Optional<AuthUser> optional = Optional.ofNullable(authUser);
         if (optional.isEmpty())

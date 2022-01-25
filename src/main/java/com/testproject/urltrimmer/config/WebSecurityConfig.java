@@ -54,8 +54,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/UrlTrimmer/api/admin/**").hasRole(Role.ADMIN.name())
                 .antMatchers(HttpMethod.POST, "/UrlTrimmer/api/profile").anonymous()
-                .antMatchers("/UrlTrimmer/api/profile/**").hasRole(Role.ADMIN.name())
-//                .antMatchers(HttpMethod.POST, "/UrlTrimmer/").
                 .antMatchers("/UrlTrimmer/api/**").authenticated()
                 .and().httpBasic()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
