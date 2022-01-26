@@ -2,6 +2,7 @@ package com.testproject.urltrimmer.web;
 
 import com.testproject.urltrimmer.model.LinkingCounter;
 import com.testproject.urltrimmer.model.ShortUrl;
+import com.testproject.urltrimmer.repository.JpaIpRepository;
 import com.testproject.urltrimmer.repository.JpaStatsRepository;
 import com.testproject.urltrimmer.repository.JpaUrlRepository;
 import com.testproject.urltrimmer.util.exception.IllegalRequestDataException;
@@ -21,10 +22,12 @@ import java.util.Optional;
 public class UrlRestController {
     private final JpaUrlRepository urlRepository;
     private final JpaStatsRepository statsRepository;
+    private final JpaIpRepository ipRepository;
 
-    public UrlRestController(JpaUrlRepository urlRepository, JpaStatsRepository statsRepository) {
+    public UrlRestController(JpaUrlRepository urlRepository, JpaStatsRepository statsRepository, JpaIpRepository ipRepository) {
         this.urlRepository = urlRepository;
         this.statsRepository = statsRepository;
+        this.ipRepository = ipRepository;
     }
 
     @GetMapping
@@ -41,7 +44,7 @@ public class UrlRestController {
     }
 
     @GetMapping("/count/{id}")
-    @Operation(summary ="Get url counter",
+    @Operation(summary = "Get url counter",
             description = "Returns the number of hits on the given link (by Id). " +
                     "The link must belong to the current user.")
     public Integer getUrlsCounter(@PathVariable Integer id, @AuthenticationPrincipal AuthUser authUser) {
@@ -49,11 +52,17 @@ public class UrlRestController {
     }
 
     @GetMapping("/stats/{id}")
-    @Operation(summary ="Get list of date and counter ",
+    @Operation(summary = "Get list of date and counter ",
             description = "Returns a list of entities that contain" +
                     " information about the number of hits on a link on a certain date.")
     public List<LinkingCounter> getStatsAtUrl(@PathVariable Integer id, @AuthenticationPrincipal AuthUser authUser) {
         return statsRepository.getAllByUrlIdOrderByDate(checkUrl(id, authUser).getId());
+    }
+
+    @GetMapping("/uniqueStats/{id}")
+    @Operation(summary = "Get amount of unique requests. The link must belong to the current user")
+    public Integer getUniqueStats(@PathVariable Integer id, @AuthenticationPrincipal AuthUser authUser) {
+        return ipRepository.getAllByUrlId(checkUrl(id, authUser).getId()).size();
     }
 
     private ShortUrl checkUrl(Integer id, AuthUser authUser) {

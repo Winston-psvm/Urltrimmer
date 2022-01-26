@@ -1,7 +1,9 @@
 package com.testproject.urltrimmer.web;
 
+import com.testproject.urltrimmer.model.IpAddress;
 import com.testproject.urltrimmer.model.LinkingCounter;
 import com.testproject.urltrimmer.model.ShortUrl;
+import com.testproject.urltrimmer.repository.JpaIpRepository;
 import com.testproject.urltrimmer.repository.JpaStatsRepository;
 import com.testproject.urltrimmer.repository.JpaUrlRepository;
 import com.testproject.urltrimmer.to.UrlTo;
@@ -21,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -31,21 +34,24 @@ import java.util.Optional;
 public class ApiRestController {
 
     private final JpaUrlRepository urlRepository;
-    private final CodeGenerator generator;
     private final JpaStatsRepository statsRepository;
+    private final JpaIpRepository ipRepository;
+    private final CodeGenerator generator;
     private static final String PATH = "http://localhost:8080/UrlTrimmer/";
 
-    public ApiRestController(JpaUrlRepository repository, CodeGenerator generator, JpaStatsRepository statsRepository) {
+    public ApiRestController(JpaUrlRepository repository, CodeGenerator generator,
+                             JpaStatsRepository statsRepository, JpaIpRepository ipRepository) {
         this.urlRepository = repository;
         this.generator = generator;
         this.statsRepository = statsRepository;
+        this.ipRepository = ipRepository;
     }
 
     @Transactional
     @GetMapping("/{shortUrl}")
     @Operation(summary = "Redirect", description = "Performs redirects, as well as counts the number of conversions. " +
             "Swagger does not redirect.")
-    public ResponseEntity<Object> redirectUrl(@PathVariable String shortUrl) {
+    public ResponseEntity<Object> redirectUrl(@PathVariable String shortUrl, HttpServletRequest request) {
         Optional<ShortUrl> optionalShortUrl = urlRepository.findByShortUrl(PATH + shortUrl);
 
         if (optionalShortUrl.isEmpty()) throw new IllegalRequestDataException("Link not found.");
@@ -54,6 +60,7 @@ public class ApiRestController {
 
             urlRepository.updateUrlCounter(url.getId());
             updateStatsCounter(url);
+            uniqueRequestsCounter(request, url.getId());
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", url.getFullUrl());
@@ -111,5 +118,20 @@ public class ApiRestController {
     private boolean checkDate(LocalDate endDate) {
         if (ZonedDateTime.now().toLocalDate().isEqual(endDate)) return true;
         return ZonedDateTime.now().toLocalDate().isBefore(endDate);
+    }
+
+    private void uniqueRequestsCounter(HttpServletRequest request, Integer urlId){
+        String remoteAddr = "";
+
+        if (request != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
+        }
+        remoteAddr = remoteAddr + urlId.toString();
+
+        Optional<IpAddress> optional = ipRepository.getByUrlIdAndIp(urlId, remoteAddr);
+        if (optional.isEmpty()) ipRepository.save(new IpAddress(urlId, remoteAddr));
     }
 }
