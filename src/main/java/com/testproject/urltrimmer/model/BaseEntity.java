@@ -1,6 +1,5 @@
 package com.testproject.urltrimmer.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.util.ProxyUtils;
 

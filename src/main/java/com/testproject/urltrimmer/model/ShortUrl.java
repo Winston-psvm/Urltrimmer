@@ -26,7 +26,7 @@ public class ShortUrl extends BaseEntity {
     @NotBlank
     @NotEmpty
     @NotNull
-    @Column(name = "short_url",nullable = false, unique = true)
+    @Column(name = "short_url", nullable = false, unique = true)
     private String shortUrl;
 
     @Column(name = "end_date")
@@ -49,7 +49,8 @@ public class ShortUrl extends BaseEntity {
         this.counter = 0;
     }
 
-    public ShortUrl() {}
+    public ShortUrl() {
+    }
 
     public Integer getCounter() {
         return counter;
