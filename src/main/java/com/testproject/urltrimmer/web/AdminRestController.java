@@ -73,7 +73,7 @@ public class AdminRestController {
     @Transactional
     @PutMapping(value = "/urls/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Update url by id.", description = "Updates shortUrl or endDate.", responses = {
+    @Operation(summary = "Updating any url by id..", description = "Updates fields shortUrl or endDate.", responses = {
             @ApiResponse(responseCode = "204", description = "No content",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """

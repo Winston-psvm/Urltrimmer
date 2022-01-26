@@ -51,8 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/UrlTrimmer/api/admin/**").hasRole(Role.ADMIN.name())
                 .antMatchers(HttpMethod.POST, "/UrlTrimmer/api/profile").anonymous()
+                .antMatchers("/UrlTrimmer/api/admin/**").hasRole(Role.ADMIN.name())
                 .antMatchers("/UrlTrimmer/api/**").authenticated()
                 .and().httpBasic()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
